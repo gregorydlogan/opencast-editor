@@ -1,10 +1,5 @@
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        type: string
-        description: "Tag to create, format OC_MAJOR.x-YYYY-MM-DD cf 17.x-2025-04-24"
-        required: true
 
 name: Create release tag
 
