@@ -23,5 +23,7 @@ jobs:
 
       - name: tag and push
         run: |
-          git tag ${{ inputs.tag }}
-          git push origin ${{ inputs.tag }}
+          export TEMP=${{ github.ref_name }}
+          export TAG=${TEMP#r\/}-`date +%Y-%m-%d`
+          git tag $TAG
+          git push origin $TAG
