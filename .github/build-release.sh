@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -uxe
 # Build integrated version
 rm -rf build/
 export PUBLIC_URL=/editor-ui
