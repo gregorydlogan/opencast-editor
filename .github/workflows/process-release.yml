@@ -80,7 +80,6 @@ jobs:
           sed -i "s#<editor.url>.*</editor.url>#<editor.url>https://github.com/gregorydlogan/opencast-editor/releases/download/$EDITOR_TAG/oc-editor-$EDITOR_TAG.tar.gz</editor.url>#" modules/editor/pom.xml
           git add modules/editor/pom.xml
           git commit -m "Updating editor to $EDITOR_TAG"
-          git branch
           git push origin t/editor-$EDITOR_TAG
           #This token is an account wide token which allows creation of PRs and pushes.
           echo "${{ secrets.PR_TOKEN }}" > token.txt
