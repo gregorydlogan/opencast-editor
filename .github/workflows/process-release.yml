@@ -67,7 +67,7 @@ jobs:
           #This token is an account wide token which allows creation of PRs and pushes.
           #echo "GH_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> token.txt
           #gh auth login --with-token < token.txt
-          git clone -b r/$BASE_BRANCH "git@github.com:opencast/opencast.git" ~/opencast
+          git clone -b r/$BASE_BRANCH "git@github.com:gregorydlogan/opencast.git" ~/opencast
           cd ~/opencast
           git checkout -b t/editor-$EDITOR_TAG
 
