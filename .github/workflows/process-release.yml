@@ -1,5 +1,9 @@
 on:
   workflow_dispatch:
+  create:
+    tags:
+      # CF: 17.x-YYYY-MM-DD
+      - '*.x-*-*-*'
   push:
     tags:
       # CF: 17.x-YYYY-MM-DD
@@ -55,7 +59,7 @@ jobs:
 
       - name: Prepare GitHub SSH key
         env:
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_KEY: ${{ secrets.MODULE_PR_DEPLOY_KEY }}
         run: |
           install -dm 700 ~/.ssh/
           echo "${DEPLOY_KEY}" > ~/.ssh/id_ed25519
@@ -84,4 +88,4 @@ jobs:
           #This token is an account wide token which allows creation of PRs and pushes.
           echo "${{ secrets.PR_TOKEN }}" > token.txt
           gh auth login --with-token < token.txt
-          gh pr create --title "Update $BASE_BRANCH Editor to $EDITOR_TAG" --label editor --label maintenance --body "Updating Opencast $BASE_BRANCH Editor module to $EDITOR_TAG" --head=opencast:t/editor-$EDITOR_TAG --base r/$BASE_BRANCH -R opencast/opencast
+          gh pr create --title "Update $BASE_BRANCH Editor to $EDITOR_TAG" --label editor --label maintenance --body "Updating Opencast $BASE_BRANCH Editor module to [$EDITOR_TAG](https://github.com/opencast/opencast-editor/releases/tag/$EDITOR_TAG)" --head=opencast:t/editor-$EDITOR_TAG --base r/$BASE_BRANCH -R opencast/opencast
