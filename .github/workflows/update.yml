@@ -73,6 +73,7 @@ jobs:
 
       - name: Commit new version
         run: |
+          git checkout -- public/editor-settings.toml
           git fetch --unshallow origin gh-pages
           git checkout gh-pages
           # Update gh-pages
