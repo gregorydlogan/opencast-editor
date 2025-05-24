@@ -14,7 +14,7 @@ cd ~/opencast
 #then use cut to remove remotes/origin
 #then use sort, with a field delimiter of '/', sorting on the *second* key in 'n'umeric 'r'evers order
 #then only consider the first 3 entries
-ary=( `git branch -a | grep 'r/[0-9]*.x' | cut -f 3- -d '/' | sort -t '/' -k 2nr | head -n 3` )
+ary=( develop `git branch -a | grep origin | grep 'r/[0-9]*.x' | cut -f 3- -d '/' | sort -t '/' -k 2nr | head -n 3` )
 
 #Iterate through the array above.
 #If the script input matches the first item, spit out develop
@@ -22,13 +22,16 @@ ary=( `git branch -a | grep 'r/[0-9]*.x' | cut -f 3- -d '/' | sort -t '/' -k 2nr
 #If it doesn't match anything, then don't say anything
 for i in "${!ary[@]}"
 do
-  if [[ "${ary[$i]}" = "$1" ]]; then
+  if [[ "${ary[i]}" = "$1" ]]; then
     if [[ $i -eq 0 ]]; then
       echo "develop.opencast.org"
+      exit 0
     elif [[ $i -eq 1 ]]; then
       echo "stable.opencast.org"
+      exit 0
     elif [[ $i -eq 2 ]]; then
       echo "legacy.opencast.org"
+      exit 0
     fi
   fi
 done
