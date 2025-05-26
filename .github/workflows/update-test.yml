@@ -56,12 +56,12 @@ jobs:
       - name: Build App
         run: |
           # This set the editor's datasource to the relevant test server
-          sed -i "s#url.*#url = \'https://$SERVER\'#" public/editor-settings.toml
+          sed -i "s#develop.opencast.org#$SERVER#g" public/editor-settings.toml
           npm run build
         env:
           SERVER: ${{needs.detect.outputs.server}}
           PUBLIC_URL: /${{ steps.build-path.outputs.build }}
-          VITE_APP_SETTINGS_PATH: /${{ steps.build-path.outputs.build }}/ui/config/editor/editor-settings.toml
+          VITE_APP_SETTINGS_PATH: /${{ steps.build-path.outputs.build }}/editor-settings.toml
 
       - name: Prepare Git
         run: |
