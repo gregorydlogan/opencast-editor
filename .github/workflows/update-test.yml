@@ -60,7 +60,7 @@ jobs:
           npm run build
         env:
           SERVER: ${{needs.detect.outputs.server}}
-          PUBLIC_URL: /${{ steps.build-path.outputs.build }}
+          PUBLIC_URL: opencast-editor-test/${{ steps.build-path.outputs.build }}
           VITE_APP_SETTINGS_PATH: /${{ steps.build-path.outputs.build }}/editor-settings.toml
 
       - name: Prepare Git
