@@ -122,8 +122,8 @@ jobs:
         with:
           message: >
             This pull request is deployed at
-            [test.editor.opencast.org/${{ steps.build-path.outputs.build }}
-            ](https://test.editor.opencast.org/${{ steps.build-path.outputs.build }}).
+            [gregorydlogan.github.io/opencast-editor-test/${{ steps.build-path.outputs.build }}
+            ](https://gregorydlogan.github.io/opencast-editor-test/${{ steps.build-path.outputs.build }}).
 
             It might take a few minutes for it to become available.
 
