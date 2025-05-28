@@ -116,7 +116,7 @@ jobs:
         run: |
           cd ~/editor-test
           git add .
-          git --amend commit -m "Build ${{ steps.build-path.outputs.build }}"
+          git commit --amend -m "Build ${{ steps.build-path.outputs.build }}"
 
       - name: Push updates
         run: |
