@@ -90,6 +90,7 @@ jobs:
           git checkout gh-pages
 
       - name: Cleanup test repository
+        run: |
           cd ~/editor-test
           ./cleanup-deployments.sh ${{ github.repository_owner }}/opencast-editor
           git add .
