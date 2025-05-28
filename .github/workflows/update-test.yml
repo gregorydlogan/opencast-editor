@@ -120,7 +120,7 @@ jobs:
       - name: Push updates
         run: |
           cd ~/editor-test
-          git push origin gh-pages
+          git push origin gh-pages --force
 
       - name: Add comment with deployment location
         uses: thollander/actions-comment-pull-request@v3
