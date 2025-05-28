@@ -89,6 +89,12 @@ jobs:
           cd ~/editor-test
           git checkout gh-pages
 
+      - name: Cleanup test repository
+          cd ~/editor-test
+          ./cleanup-deployments.sh ${{ github.repository_owner }}/opencast-editor
+          git add .
+          #git commit -m "Removing test deployments for closed pull requests"
+
       - name: Store build
         env:
           DEPLOY_PATH: editor-test/${{ steps.build-path.outputs.build }}
@@ -109,7 +115,7 @@ jobs:
         run: |
           cd ~/editor-test
           git add .
-          git commit -m "Build ${{ steps.build-path.outputs.build }}"
+          git --amend commit -m "Build ${{ steps.build-path.outputs.build }}"
 
       - name: Push updates
         run: |
