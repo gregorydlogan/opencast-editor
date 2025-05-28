@@ -1,6 +1,4 @@
 #!/bin/bash
-echo "develop.opencast.org"
-exit 0
 
 if [ $# -ne 1 ]; then
   echo "Usage: $0 OC_VERSION"
