@@ -92,7 +92,7 @@ jobs:
       - name: Cleanup test repository
         run: |
           cd ~/editor-test
-          wget https://raw.githubusercontent.com/opencast/opencast-editor-test/main/.github/scripts/cleanup-deployments.sh
+          wget https://raw.githubusercontent.com/gregorydlogan/opencast-editor-test/main/.github/scripts/cleanup-deployments.sh
           bash cleanup-deployments.sh ${{ github.repository_owner }}/opencast-editor
           rm -f cleanup-deployments.sh
           git add .
