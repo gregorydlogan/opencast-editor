@@ -92,7 +92,9 @@ jobs:
       - name: Cleanup test repository
         run: |
           cd ~/editor-test
-          ./cleanup-deployments.sh ${{ github.repository_owner }}/opencast-editor
+          wget https://raw.githubusercontent.com/opencast/opencast-editor-test/main/.github/scripts/cleanup-deployments.sh
+          bash cleanup-deployments.sh ${{ github.repository_owner }}/opencast-editor
+          rm -f cleanup-deployments.sh
           git add .
           #git commit -m "Removing test deployments for closed pull requests"
 
