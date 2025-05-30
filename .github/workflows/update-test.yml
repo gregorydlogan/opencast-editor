@@ -108,6 +108,8 @@ jobs:
           echo '</ul></body></html>' >> index.html
 
       - name: Cleanup test repository
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           cd ~/editor-test
           wget https://raw.githubusercontent.com/gregorydlogan/opencast-editor-test/main/.github/scripts/cleanup-deployments.sh
