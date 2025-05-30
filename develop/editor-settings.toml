@@ -8,17 +8,17 @@
 # ⚠️  Please do not use this for production deployments.
 
 
-# Pick a default event identifier which should be on stable.opencast.org
+# Pick a default event identifier which should be on develop.opencast.org
 id = 'ID-dual-stream-demo'
 
-# Callback to stable.opencast.org
-allowedCallbackPrefixes = ["https://stable.opencast.org"]
-callbackUrl = "https://stable.opencast.org"
+# Callback to develop.opencast.org
+allowedCallbackPrefixes = ["https://develop.opencast.org"]
+callbackUrl = "https://develop.opencast.org"
 callbackSystem = "OPENCAST"
 
 [opencast]
-# Connect to stable.opencast.org and use the default demo user
-url = 'https://stable.opencast.org'
+# Connect to develop.opencast.org and use the default demo user
+url = 'https://develop.opencast.org'
 name = "admin"
 password = "opencast"
 
@@ -28,6 +28,8 @@ show = true
 
 [trackSelection]
 show = true
+atLeastOneVideo = true
+atMostTwoVideos = true
 
 [subtitles]
 show = true
