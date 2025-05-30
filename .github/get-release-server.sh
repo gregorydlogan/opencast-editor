@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "develop.opencast.org"
+exit 0
+
 if [ $# -ne 1 ]; then
   echo "Usage: $0 OC_VERSION"
   echo " eg: $0 r/16.x -> Returns the current correct server for r/16.x"
