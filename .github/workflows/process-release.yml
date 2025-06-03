@@ -39,11 +39,30 @@ jobs:
 
       - name: create release tarball
         working-directory: build
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           tar -czf "../oc-editor-$(git describe --tags).tar.gz" *
-          echo EDITOR_CHECKSUM=`sha256sum oc-editor-$(git describe --tags).tar.gz | cut -f 1 -d " "` >> $GITHUB_ENV
+          echo EDITOR_CHECKSUM=`sha256sum ../oc-editor-$(git describe --tags).tar.gz | cut -f 1 -d " "` >> $GITHUB_ENV
           echo EDITOR_TAG=$(git describe --tags) >> $GITHUB_ENV
-          echo BASE_BRANCH=$(git describe --tags | cut -c 1-4) >> $GITHUB_ENV
+          while read branchname
+          do
+            if [ "$branchname" != "r/`git describe --tags | cut -f 1 -d -`" ]; then
+              continue
+            fi
+            echo "Base branch is $branchname"
+            BASE_BRANCH="$branchname"
+            echo "BASE_BRANCH=$branchname" >> $GITHUB_ENV
+            break
+          done <<< `gh api \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/opencast/opencast/branches?per_page=100 | \
+            jq -r '. | map(select(.name | match("r/[0-9]*.x|develop"))) | .[].name'`
+          if [ -z "${BASE_BRANCH}" ]; then
+            echo "Base branch is develop"
+            echo "BASE_BRANCH=develop" >> $GITHUB_ENV
+          fi
 
       - name: create new release
         uses: softprops/action-gh-release@v2
