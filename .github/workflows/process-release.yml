@@ -35,11 +35,32 @@ jobs:
 
       - name: create release tarball
         working-directory: build
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           tar -czf "../oc-editor-$(git describe --tags).tar.gz" *
-          echo EDITOR_CHECKSUM=`sha256sum oc-editor-$(git describe --tags).tar.gz | cut -f 1 -d " "` >> $GITHUB_ENV
+          echo EDITOR_CHECKSUM=`sha256sum ../oc-editor-$(git describe --tags).tar.gz | cut -f 1 -d " "` >> $GITHUB_ENV
           echo EDITOR_TAG=$(git describe --tags) >> $GITHUB_ENV
-          echo BASE_BRANCH=$(git describe --tags | cut -c 1-4) >> $GITHUB_ENV
+          while read branchname
+          do
+            #branchname looks like 'develop' or 'r/17.x', the describe + cut looks like '17.x', so we prefix with r/
+            # NB: branchname == develop *should not match* anything so that we fall back to the if case below
+            if [ "$branchname" != "r/`git describe --tags | cut -f 1 -d -`" ]; then
+              continue
+            fi
+            echo "Base branch is $branchname"
+            BASE_BRANCH="$branchname"
+            echo "BASE_BRANCH=$branchname" >> $GITHUB_ENV
+            break
+          done <<< `gh api \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/opencast/opencast/branches?per_page=100 | \
+            jq -r '. | map(select(.name | match("r/[0-9]*.x|develop"))) | .[].name'`
+          if [ -z "${BASE_BRANCH}" ]; then
+            echo "Base branch is develop"
+            echo "BASE_BRANCH=develop" >> $GITHUB_ENV
+          fi
 
       - name: create new release
         uses: softprops/action-gh-release@v2
@@ -64,16 +85,11 @@ jobs:
 
       - name: Clone upstream repository
         run: |
-          #This token is an account wide token which allows creation of PRs and pushes.
-          #echo "GH_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> token.txt
-          #gh auth login --with-token < token.txt
-          git clone -b r/$BASE_BRANCH "git@github.com:opencast/opencast.git" ~/opencast
+          git clone -b $BASE_BRANCH "git@github.com:opencast/opencast.git" ~/opencast
           cd ~/opencast
           git checkout -b t/editor-$EDITOR_TAG
 
       - name: Update the editor pom file
-        #env:
-        #  GH_TOKEN: ${{ github.token }}
         run: |
           cd ~/opencast
           sed -i "s#<editor.sha256>.*</editor.sha256>#<editor.sha256>$EDITOR_CHECKSUM</editor.sha256>#" modules/editor/pom.xml
@@ -84,4 +100,10 @@ jobs:
           #This token is an account wide token which allows creation of PRs and pushes.
           echo "${{ secrets.PR_TOKEN }}" > token.txt
           gh auth login --with-token < token.txt
-          gh pr create --title "Update $BASE_BRANCH Editor to $EDITOR_TAG" --label editor --label maintenance --body "Updating Opencast $BASE_BRANCH Editor module to [$EDITOR_TAG](https://github.com/opencast/opencast-editor/releases/tag/$EDITOR_TAG)" --head=opencast:t/editor-$EDITOR_TAG --base r/$BASE_BRANCH -R opencast/opencast
+          gh pr create \
+            --title "Update $BASE_BRANCH Editor to $EDITOR_TAG" \
+            --label editor --label maintenance \
+            --body "Updating Opencast $BASE_BRANCH Editor module to [$EDITOR_TAG](https://github.com/opencast/opencast-editor/releases/tag/$EDITOR_TAG)" \
+            --head=opencast:t/editor-$EDITOR_TAG \
+            --base $BASE_BRANCH \
+            -R opencast/opencast
