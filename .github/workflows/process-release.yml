@@ -98,7 +98,7 @@ jobs:
           git commit -m "Updating editor to $EDITOR_TAG"
           git push origin t/editor-$EDITOR_TAG
           #This token is an account wide token which allows creation of PRs and pushes.
-          echo "${{ secrets.PR_TOKEN }}" > token.txt
+          echo "${{ secrets.MODULE_PR_TOKEN }}" > token.txt
           gh auth login --with-token < token.txt
           gh pr create \
             --title "Update $BASE_BRANCH Editor to $EDITOR_TAG" \
