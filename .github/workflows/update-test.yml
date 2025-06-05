@@ -13,7 +13,7 @@ concurrency:
 jobs:
   detect:
     if: ${{ needs.member.outputs.is_team_member == 'true'
-      || github.event.pull_request.head.repo.full_name == 'opencast/opencast-editor' }}
+      || github.event.pull_request.head.repo.full_name == 'gregorydlogan/opencast-editor' }}
     runs-on: ubuntu-latest
     outputs:
       server: ${{ steps.test-server.outputs.server }}
@@ -137,8 +137,8 @@ jobs:
         with:
           message: >
             This pull request is deployed at
-            [test.editor.opencast.org/${{ steps.build-path.outputs.build }}
-            ](https://test.editor.opencast.org/${{ steps.build-path.outputs.build }}).
+            [test.editor.loganite.ca/${{ steps.build-path.outputs.build }}
+            ](https://test.editor.loganite.ca/${{ steps.build-path.outputs.build }}).
 
             It might take a few minutes for it to become available.
 
