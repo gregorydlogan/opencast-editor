@@ -93,25 +93,19 @@ How to cut a release for Opencast
 ---------------------------------
 
 1. (Optional) Run the [Update translations](https://github.com/opencast/opencast-editor/actions/workflows/update-translations.yml) workflow, to make sure all changes from crowdin are included in the next release.
-1. Switch to the commit you want to turn into the release
+1. Switch to the commit you want to turn into the release - make sure this is the on `develop` or an `r/N.x` branch
 1. Create and push a new tag
    ```bash
+    BRANCH=N.x (make sure the version you write here matches the branch you have checked out)
     DATE=$(date +%Y-%m-%d)
-    git tag -m Release -s "$DATE"
-    git push upstream "$DATE":"$DATE"
+    git tag -m "Release $BRANCH-$DATE" -s "$BRANCH-$DATE"
+    git push upstream "$BRANCH-$DATE":"$BRANCH-$DATE"
    ```
-1. Wait for the [Create release draft](https://github.com/opencast/opencast-editor/actions/workflows/create-release.yml)
+1. Wait for the [Create release](https://github.com/opencast/opencast-editor/actions/workflows/process-release.yml)
    workflow to finish
-    - It will create a new [GitHub release draft](https://github.com/opencast/opencast-editor/releases)
-    - Review and publish the draft
+    - It will create a new [GitHub release](https://github.com/opencast/opencast-editor/releases)
+    - Review and edit the release to make sure the release notes are correct
         - By selecting the previous release, Github can generate release notes automatically
-1. Submit a pull request against Opencast
-    - [Update the release](https://github.com/opencast/opencast/blob/b2bea8822b95b8692bb5bbbdf75c9931c2b7298a/modules/editor/pom.xml#L16-L17)
-    - [Adjust the documentation](https://github.com/opencast/opencast/blob/b2bea8822b95b8692bb5bbbdf75c9931c2b7298a/docs/guides/admin/docs/modules/editor.md)
-      if necessary
-    - [Update the configuration](https://github.com/opencast/opencast/blob/b2bea8822b95b8692bb5bbbdf75c9931c2b7298a/etc/ui-config/mh_default_org/editor/editor-settings.toml)
-      if necessary
-    - Verify that the new release runs in Opencast, then create the pull request.
 
 
 Opencast API used by the Editor

@@ -6,7 +6,8 @@ on:
       - 'dependabot/**'
   pull_request:
     branches:
-      - main
+      - develop
+      - r/*
 
 jobs:
   test:
