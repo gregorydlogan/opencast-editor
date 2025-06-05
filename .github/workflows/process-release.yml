@@ -1,5 +1,9 @@
 on:
   workflow_dispatch:
+  create:
+    tags:
+      # CF: 17.x-YYYY-MM-DD
+      - '*.x-*-*-*'
   push:
     tags:
       # CF: 17.x-YYYY-MM-DD
