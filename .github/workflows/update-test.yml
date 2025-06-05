@@ -107,16 +107,27 @@ jobs:
           | sed 's/^\(.*\)$/<li><a href=\1>\1<\/a><\/li>/' >> index.html
         echo '</ul></body></html>' >> index.html
 
+    - name: Cleanup test repository
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        cd ~/editor-test
+        wget https://raw.githubusercontent.com/opencast/opencast-editor-test/main/.github/scripts/cleanup-deployments.sh
+        bash cleanup-deployments.sh ${{ github.repository_owner }}/opencast-editor
+        rm -f cleanup-deployments.sh
+        git add .
+        #git commit -m "Removing test deployments for closed pull requests"
+
     - name: Commit new version
       run: |
         cd ~/editor-test
         git add .
-        git commit -m "Build ${{ steps.build-path.outputs.build }}"
+        git commit --amend -m "Build ${{ steps.build-path.outputs.build }}"
 
     - name: Push updates
       run: |
         cd ~/editor-test
-        git push origin gh-pages
+        git push origin gh-pages --force
 
     - name: Add comment with deployment location
       uses: thollander/actions-comment-pull-request@v3

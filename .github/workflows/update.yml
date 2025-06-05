@@ -72,44 +72,25 @@ jobs:
         git config --global user.name "Release Bot"
         git config --global user.email "cloud@opencast.org"
 
-    - name: Prepare GitHub SSH key
-      env:
-        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-      run: |
-        install -dm 700 ~/.ssh/
-        echo "${DEPLOY_KEY}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-    - name: Clone repository
-      run: |
-        git clone "git@github.com:opencast/opencast-editor.git" ~/editor-clone
-        cd ~/editor-clone
-        git checkout gh-pages
-
     - name: Commit new version
       run: |
-        #Temp becomes something like r/17.x
-        export TEMP=${{ github.ref_name }}
-        #Strip the r/ prefix, giving us just 17.x.  If this is main/develop this does nothing
-        export TARGET=~/editor-clone/${TEMP#r\/}
+        git checkout -- public/editor-settings.toml
+        git fetch --unshallow origin gh-pages
+        git checkout gh-pages
         # Update gh-pages
-        rm -rf $TARGET
-        mkdir -p $TARGET
-        cp -r build/* $TARGET
-        # Add the new build to the repo
-        cd ~/editor-clone
+        rm -rf $BRANCH
+        mv build $BRANCH
         #Generate an index, in case anyone lands at the root of the test domain
         echo '<html><body><ul>' > index.html
         find . -mindepth 1 -maxdepth 1 -type d \
-          | grep -v .git \
+          | grep '[0-9]*.x\|develop' \
           | sort -r \
           | sed 's/^\(.*\)$/<li><a href=\1>\1<\/a><\/li>/' >> index.html
         echo '</ul></body></html>' >> index.html
-        git add ./*
+        git add $BRANCH index.html
         git diff --staged --quiet || git commit --amend -m "Build $(date)"
+      env:
+        BRANCH: ${{needs.detect.outputs.branch}}
 
     - name: Push updates
-      run: |
-        cd ~/editor-clone
-        git push origin gh-pages --force
+      run: git push origin gh-pages --force
