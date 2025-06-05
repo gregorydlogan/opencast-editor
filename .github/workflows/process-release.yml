@@ -11,6 +11,10 @@ jobs:
     name: Create release from tag
     if: github.repository_owner == 'opencast'
     runs-on: ubuntu-latest
+    outputs:
+      checksum: ${{ steps.tarball.outputs.checksum }}
+      tag: ${{ steps.tarball.outputs.tag }}
+      branch: ${{ steps.tarball.outputs.branch }}
     permissions:
       contents: write #for the release
       pull-requests: write #For the PR in the upstream repo
@@ -34,13 +38,14 @@ jobs:
         run: npm run build
 
       - name: create release tarball
+        id: tarball
         working-directory: build
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tar -czf "../oc-editor-$(git describe --tags).tar.gz" *
-          echo EDITOR_CHECKSUM=`sha256sum ../oc-editor-$(git describe --tags).tar.gz | cut -f 1 -d " "` >> $GITHUB_ENV
-          echo EDITOR_TAG=$(git describe --tags) >> $GITHUB_ENV
+          echo checksum=`sha256sum ../oc-editor-$(git describe --tags).tar.gz | cut -f 1 -d " "` >> $GITHUB_OUTPUT
+          echo tag=$(git describe --tags) >> $GITHUB_OUTPUT
           while read branchname
           do
             #branchname looks like 'develop' or 'r/17.x', the describe + cut looks like '17.x', so we prefix with r/
@@ -50,7 +55,7 @@ jobs:
             fi
             echo "Base branch is $branchname"
             BASE_BRANCH="$branchname"
-            echo "BASE_BRANCH=$branchname" >> $GITHUB_ENV
+            echo "branch=$branchname" >> $GITHUB_OUTPUT
             break
           done <<< `gh api \
               -H "Accept: application/vnd.github+json" \
@@ -59,7 +64,7 @@ jobs:
             jq -r '. | map(select(.name | match("r/[0-9]*.x|develop"))) | .[].name'`
           if [ -z "${BASE_BRANCH}" ]; then
             echo "Base branch is develop"
-            echo "BASE_BRANCH=develop" >> $GITHUB_ENV
+            echo "branch=develop" >> $GITHUB_OUTPUT
           fi
 
       - name: create new release
@@ -69,6 +74,16 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: true
 
+  upstream-pr:
+    name: Create upstream PR to incorporate release
+    if: github.repository_owner == 'opencast'
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write #for the release
+      pull-requests: write #For the PR in the upstream repo
+
+    steps:
       - name: Prepare git
         run: |
           git config --global user.name "Release Bot"
@@ -85,25 +100,25 @@ jobs:
 
       - name: Clone upstream repository
         run: |
-          git clone -b $BASE_BRANCH "git@github.com:opencast/opencast.git" ~/opencast
+          git clone -b ${{ needs.build.outputs.branch }} "git@github.com:opencast/opencast.git" ~/opencast
           cd ~/opencast
-          git checkout -b t/editor-$EDITOR_TAG
+          git checkout -b t/editor-${{ needs.build.outputs.tag }}
 
       - name: Update the editor pom file
         run: |
           cd ~/opencast
-          sed -i "s#<editor.sha256>.*</editor.sha256>#<editor.sha256>$EDITOR_CHECKSUM</editor.sha256>#" modules/editor/pom.xml
-          sed -i "s#<editor.url>.*</editor.url>#<editor.url>https://github.com/opencast/opencast-editor/releases/download/$EDITOR_TAG/oc-editor-$EDITOR_TAG.tar.gz</editor.url>#" modules/editor/pom.xml
+          sed -i "s#<editor.sha256>.*</editor.sha256>#<editor.sha256>${{ needs.build.outputs.checksum }}</editor.sha256>#" modules/editor/pom.xml
+          sed -i "s#<editor.url>.*</editor.url>#<editor.url>https://github.com/opencast/opencast-editor/releases/download/${{ needs.build.outputs.tag }}/oc-editor-${{ needs.build.outputs.tag }}.tar.gz</editor.url>#" modules/editor/pom.xml
           git add modules/editor/pom.xml
-          git commit -m "Updating editor to $EDITOR_TAG"
-          git push origin t/editor-$EDITOR_TAG
+          git commit -m "Updating editor to ${{ needs.build.outputs.tag }}"
+          git push origin t/editor-${{ needs.build.outputs.tag }}
           #This token is an account wide token which allows creation of PRs and pushes.
           echo "${{ secrets.MODULE_PR_TOKEN }}" > token.txt
           gh auth login --with-token < token.txt
           gh pr create \
-            --title "Update $BASE_BRANCH Editor to $EDITOR_TAG" \
+            --title "Update ${{ needs.build.outputs.branch }} Editor to ${{ needs.build.outputs.tag }}" \
             --label editor --label maintenance \
-            --body "Updating Opencast $BASE_BRANCH Editor module to [$EDITOR_TAG](https://github.com/opencast/opencast-editor/releases/tag/$EDITOR_TAG)" \
-            --head=opencast:t/editor-$EDITOR_TAG \
-            --base $BASE_BRANCH \
+            --body "Updating Opencast ${{ needs.build.outputs.branch }} Editor module to [${{ needs.build.outputs.tag }}](https://github.com/opencast/opencast-editor/releases/tag/${{ needs.build.outputs.tag }})" \
+            --head=opencast:t/editor-${{ needs.build.outputs.tag }} \
+            --base ${{ needs.build.outputs.branch }} \
             -R opencast/opencast
