@@ -87,7 +87,7 @@ jobs:
 
       - name: Clone repository
         run: |
-          git clone "git@github.com:opencast/opencast-editor-test.git" ~/editor-test
+          git clone "git@github.com:${{ github.repository_owner }}/opencast-editor-test.git" ~/editor-test
           cd ~/editor-test
           git checkout gh-pages
 
@@ -112,7 +112,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cd ~/editor-test
-          wget https://raw.githubusercontent.com/opencast/opencast-editor-test/main/.github/scripts/cleanup-deployments.sh
+          wget https://raw.githubusercontent.com/${{ github.repository_owner }}/opencast-editor-test/main/.github/scripts/cleanup-deployments.sh
           bash cleanup-deployments.sh ${{ github.repository_owner }}/opencast-editor
           rm -f cleanup-deployments.sh
           git add .
