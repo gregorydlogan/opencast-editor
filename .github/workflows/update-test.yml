@@ -103,10 +103,10 @@ jobs:
           cp -rv build/* ${DEPLOY_PATH}
 
       - name: Cleanup test repository
+        working-directory: editor-test
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cd ~/editor-test
           wget https://raw.githubusercontent.com/${{ github.repository_owner }}/opencast-editor-test/main/.github/scripts/cleanup-deployments.sh
           bash cleanup-deployments.sh ${{ github.repository_owner }}/opencast-editor
           rm -f cleanup-deployments.sh
@@ -122,14 +122,14 @@ jobs:
           echo '</ul></body></html>' >> index.html
 
       - name: Commit new version
+        working-directory: editor-test
         run: |
-          cd ~/editor-test
           git add .
           git commit --amend -m "Build ${{ steps.build-path.outputs.build }}"
 
       - name: Push updates
+        working-directory: editor-test
         run: |
-          cd ~/editor-test
           git push origin gh-pages --force
 
       - name: Add comment with deployment location
