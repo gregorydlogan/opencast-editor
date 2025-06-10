@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - develop
-      - r/*
+      - r/*.x
 
 concurrency:
   group: ${{ github.workflow }}
