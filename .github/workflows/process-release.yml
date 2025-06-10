@@ -60,7 +60,7 @@ jobs:
           done <<< `gh api \
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
-              /repos/${{ github.repository_owner }}opencast/branches?per_page=100 | \
+              /repos/${{ github.repository_owner }}/opencast/branches?per_page=100 | \
             jq -r '. | map(select(.name | match("r/[0-9]*.x|develop"))) | .[].name'`
           if [ -z "${BASE_BRANCH}" ]; then
             echo "Base branch is develop"
