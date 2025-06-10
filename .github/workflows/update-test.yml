@@ -1,4 +1,4 @@
-name: Test & Deploy
+name: Publish Pull Request Page
 
 on:
   pull_request_target:
@@ -47,7 +47,7 @@ jobs:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
 
-      - name: Use Node.js 20.x
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
