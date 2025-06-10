@@ -7,7 +7,7 @@ on:
       - r/*
 
 concurrency:
-  group: editor.opencast.org
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 jobs:

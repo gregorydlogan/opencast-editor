@@ -6,6 +6,10 @@ on:
       - opened
       - synchronize
 
+concurrency:
+  group: pull-request-page
+  cancel-in-progress: false
+
 jobs:
   detect:
     if: ${{ needs.member.outputs.is_team_member == 'true'
