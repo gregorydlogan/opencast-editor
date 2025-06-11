@@ -100,7 +100,9 @@ jobs:
 
       - name: Clone upstream repository
         run: |
-          git clone -b t/editor-${{ needs.build.outputs.branch }} "git@github.com:${{ github.repository_owner }}/opencast.git" opencast
+          git clone -b ${{ needs.build.outputs.branch }} "git@github.com:${{ github.repository_owner }}/opencast.git" ~/opencast
+          cd ~/opencast
+          git checkout -b t/editor-${{ needs.build.outputs.tag }}
 
       - name: Update the editor pom file
         working-directory: ~/opencast
