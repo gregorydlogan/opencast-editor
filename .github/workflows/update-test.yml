@@ -12,8 +12,7 @@ concurrency:
 
 jobs:
   detect:
-    if: ${{ needs.member.outputs.is_team_member == 'true'
-      || github.event.pull_request.head.repo.full_name == 'opencast/opencast-editor' }}
+    if: ${{ needs.member.outputs.is_team_member == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       server: ${{ steps.test-server.outputs.server }}
