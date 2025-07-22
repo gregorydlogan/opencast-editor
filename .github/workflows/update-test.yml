@@ -12,6 +12,7 @@ concurrency:
 
 jobs:
   detect:
+    needs: member
     if: ${{ needs.member.outputs.is_team_member == 'true' }}
     runs-on: ubuntu-latest
     outputs:
